@@ -123,3 +123,75 @@ if st.button("Optimize"):
 
     # Show plot
     st.pyplot(fig)
+     fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Plot the robot structure for the best result
+    positions = forward_kinematics(best_joint_angles)
+    for i in range(len(positions)-1):
+        ax.plot([positions[i][0], positions[i+1][0]], 
+                [positions[i][1], positions[i+1][1]], 
+                [positions[i][2], positions[i+1][2]], 'b-')
+
+    # Plot the desired end-effector position
+    ax.scatter(end_effector_desired[0], end_effector_desired[1], end_effector_desired[2], color='r', label='Desired Position')
+
+    # Plot the optimized end-effector positions
+    optimized_positions = [result[1] for result in optimized_results]
+    optimized_positions = np.array(optimized_positions)
+    ax.scatter(optimized_positions[:, 0], optimized_positions[:, 1], optimized_positions[:, 2], color='g', label='Optimized Positions')
+
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    ax.legend()
+
+    # Show plot
+    st.pyplot(fig)
+
+    # Optimization progress and convergence plot
+    fig, ax = plt.subplots()
+    for idx, (joint_angles, _) in enumerate(optimized_results):
+        error_values = []
+        def callback(xk):
+            error_values.append(objective_function(xk, end_effector_desired))
+        minimize(objective_function, initial_guesses[idx], args=(end_effector_desired,), method='SLSQP', bounds=bounds, callback=callback)
+        ax.plot(error_values, label=f'Initial Guess {idx+1}')
+    
+    ax.set_xlabel('Iteration')
+    ax.set_ylabel('Objective Function Value')
+    ax.legend()
+    st.pyplot(fig)
+
+    # Visualize joint angles
+    fig, ax = plt.subplots()
+    ax.plot(best_joint_angles, 'bo-', label='Best Joint Angles')
+    ax.set_xlabel('Joint')
+    ax.set_ylabel('Angle (degrees)')
+    ax.legend()
+    st.pyplot(fig)
+
+    # Save and load configurations
+    if st.button("Save Configuration"):
+        np.save("best_joint_angles.npy", best_joint_angles)
+        st.write("Configuration saved.")
+    if st.button("Load Configuration"):
+        loaded_joint_angles = np.load("best_joint_angles.npy")
+        loaded_end_effector_position = forward_kinematics(loaded_joint_angles)[-1]
+        st.write("Loaded Joint Angles:", loaded_joint_angles)
+        st.write("Loaded End-Effector Position:", loaded_end_effector_position)
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        positions = forward_kinematics(loaded_joint_angles)
+        for i in range(len(positions)-1):
+            ax.plot([positions[i][0], positions[i+1][0]], 
+                    [positions[i][1], positions[i+1][1]], 
+                    [positions[i][2], positions[i+1][2]], 'b-')
+        ax.scatter(end_effector_desired[0], end_effector_desired[1], end_effector_desired[2], color='r', label='Desired Position')
+        ax.scatter(loaded_end_effector_position[0], loaded_end_effector_position[1], loaded_end_effector_position[2], color='g', label='Loaded Position')
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Z')
+        ax.legend()
+        st.pyplot(fig)
+
