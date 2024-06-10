@@ -98,7 +98,7 @@ if st.button("Optimize"):
         st.write(f"Initial Guess {idx+1}: Joint Angles = {joint_angles}, End-Effector Position = {end_effector_position}")
 
     # Plotting
-    
+    fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
     # Plot the robot structure for the best result
@@ -114,7 +114,6 @@ if st.button("Optimize"):
     # Plot the optimized end-effector positions
     optimized_positions = [result[1] for result in optimized_results]
     optimized_positions = np.array(optimized_positions)
-    ax.scatter(optimized_positions[:, 0], optimized_positions[:, 1], optimized_positions[:, 2], color='g', label='Optimized Positions')
 
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
