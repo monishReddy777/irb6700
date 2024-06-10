@@ -98,7 +98,7 @@ if st.button("Optimize"):
         st.write(f"Initial Guess {idx+1}: Joint Angles = {joint_angles}, End-Effector Position = {end_effector_position}")
 
     # Plotting
-    fig = plt.figure()
+    
     ax = fig.add_subplot(111, projection='3d')
 
     # Plot the robot structure for the best result
