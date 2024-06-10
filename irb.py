@@ -123,7 +123,7 @@ if st.button("Optimize"):
 
     # Show plot
     st.pyplot(fig)
-     fig = plt.figure()
+     
     ax = fig.add_subplot(111, projection='3d')
 
     # Plot the robot structure for the best result
